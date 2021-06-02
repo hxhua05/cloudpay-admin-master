@@ -8,12 +8,12 @@ const getters = {
     avatar: state => state.user.avatar,
     name: state => state.user.name,
     introduction: state => state.user.introduction,
-    //roles: state => state.user.roles,
+    roles: state => state.user.roles,
     permission_routes: state => state.permission.routes,
     errorLogs: state => state.errorLog.logs,
+    user: state => state.user.user,
     rsaKey: state => state.user.rsaKey,
     refreshTime: state => state.user.refreshTime,
     tokenExpire: state => state.user.tokenExpire
-  }
-  export default getters
-  
+}
+export default getters

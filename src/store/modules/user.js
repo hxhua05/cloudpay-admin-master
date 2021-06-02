@@ -2,6 +2,7 @@ import { login, logout, getInfo, getRsaKey } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
+
 const state = {
     token: getToken(),
     tokenExpire: null,
@@ -9,6 +10,7 @@ const state = {
     name: '',
     avatar: '',
     introduction: '',
+    user: null,
     roles: [],
     rsaKey: []
 }
@@ -32,6 +34,9 @@ const mutations = {
     SET_AVATAR: (state, avatar) => {
         state.avatar = avatar
     },
+    SET_USER: (state, user) => {
+        state.user = user
+    },
     SET_ROLES: (state, roles) => {
         state.roles = roles
     },
@@ -46,7 +51,7 @@ const actions = {
         const { username, password, number } = userInfo
         return new Promise((resolve, reject) => {
             login({ name: username.trim(), pass: password, number: number }).then(res => {
-                console.log('login:' + JSON.stringify(res))
+                // console.log('login:' + JSON.stringify(res))
                 const { success, msg, response } = res
                 if (!success) { //登录失败返回报错信息
                     reject(msg)
@@ -67,10 +72,11 @@ const actions = {
     getRsaKey ({ commit }) {
         return new Promise((resolve, reject) => {
             getRsaKey().then(res => {
+                // console.log('rsa:' + JSON.stringify(res))
                 const { response } = res
-                //console.log('rsa:' + JSON.stringify(response))
+
                 commit('SET_RSAKEY', response)
-                resolve()
+                resolve(response)
             }).catch(error => {
                 reject(error)
             })
@@ -81,11 +87,10 @@ const actions = {
     getInfo ({ commit, state }) {
         return new Promise((resolve, reject) => {
             getInfo(state.token).then(res => {
-                const { response } = res
-                console.log('getInfo:' + JSON.stringify(response))
-                if (!response) {
-                    console.log('Verification failed, please Login again.')
-                    reject('Verification failed, please Login again.')
+                const { success, response } = res
+                // console.log('getInfo:' + JSON.stringify(response))
+                if (!success) {
+                    reject('get info failed, please Login again.')
                 }
 
                 const { roles, uRealName: name, avatar, introduction } = response
@@ -95,6 +100,7 @@ const actions = {
                     //reject('getInfo: roles must be a non-null array!')
                 }
 
+                commit('SET_USER', response)
                 commit('SET_ROLES', roles)
                 commit('SET_NAME', name)
                 commit('SET_AVATAR', avatar)
